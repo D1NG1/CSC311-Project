@@ -25,7 +25,7 @@ We use [uv](https://docs.astral.sh/uv/) to manage Python and dependencies.
 3. Run scripts with `uv run` from the project root (no need to activate the venv):
 
    ```bash
-   uv run python some_script.py
+   uv run python src/some_script.py
    ```
 
 In VS Code, pick `.venv` via **Python: Select Interpreter**.
@@ -35,3 +35,13 @@ In VS Code, pick `.venv` via **Python: Select Interpreter**.
 Use `uv add <package>` (not `pip install`) and commit the updated `pyproject.toml` and `uv.lock`. Others then run `uv sync`.
 
 After pulling, run `uv sync` again if `uv.lock` changed.
+
+## Layout
+
+```
+data/         raw data and train/test/validation splits
+src/          development code: preprocessing, data Exploration, training, prediction
+submission/   final files uploaded to MarkUs
+report/       LaTeX report and figures
+starter/      course-provided files, reference only
+```

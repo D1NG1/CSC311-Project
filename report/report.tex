@@ -118,7 +118,7 @@ This section should be at most 1/4 page (1 paragraph).
 \end{itemize}
 
 \section{Data Exploration}\label{sec:data-exploration}
-
+\begin{comment}
 This section of your report should be at most 2 pages. 
 
 The goal of the Data Exploration step is to understand your dataset well enough to decide how to prepare it and which models to try.
@@ -132,11 +132,36 @@ Determine which features appear predictive, so that you can justify the models y
 Make sure to write down all of this reasoning. State which transformations you applied and why, and explain what each plot and table reveals.
 
 Many students in previous semesters found this section difficult, because most of data exploration is not taught explicitly in class. Appendix~\ref{app:data-exploration} gives a list of guiding questions to walk you through the process. The questions point out the common issues you should look for and the standard strategies for handling them.
+\end{comment}
+The dataset contains 870 survey responses from 290 students. Each student answered the 12 questions three times, once for each sport: soccer, basketball, and baseball. It is a 3-class classification problem. Each row has 12 features, including one numeric rating, three Likert-scale questions, three multi-select questions, five free-text questions (one of which is a number). We do not use the unique ID as a feature, because it identifies the respondent rather than the sport. The classes are perfectly balanced, with 232 examples for each sport in the training set.
 
-\subsection{Data Splitting}
-\subsection{Feature Types, Distributions, and Class Balance}
-\subsection{Missing Values, Outliers, and Inconsistencies}
-\subsection{Preprocessing}
+Before data exploration, we split the dataset into a training set of 696 examples (80\%) and a test set of 174 examples (20\%). We split by student ID rather than by row because a student's three responses share the same writing style; otherwise the model could recognize respondents instead of sports and overestimate test accuracy. The test set was set aside and not used for any exploration, preprocessing decision or tuning; hyperparameters are instead tuned by 5-fold cross-validation grouped by student ID within the training set (Section~\ref{sec:methodology}).
+
+\subsection{Numeric features}
+1. feature types and distributions, inconsistencies
+2. missing values and outliers, how to handle them
+3. how to preprocess this feature
+
+\subsection{Likert features}
+1. feature types and distributions, inconsistencies
+2. missing values and outliers, how to handle them
+3. how to preprocess this feature
+
+\subsection{Multi-select features}
+1. feature types and distributions, inconsistencies
+2. missing values and outliers, how to handle them
+3. how to preprocess this feature
+
+\subsection{Free-text features}
+1. feature types and distributions, inconsistencies
+2. missing values and outliers, how to handle them
+3. how to preprocess this feature
+
+\subsection{Price features}
+
+1. feature types and distributions, inconsistencies
+2. missing values and outliers, how to handle them
+3. how to preprocess this feature
 
 \section{Methodology}\label{sec:methodology}
 

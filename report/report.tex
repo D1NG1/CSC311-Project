@@ -133,35 +133,45 @@ Make sure to write down all of this reasoning. State which transformations you a
 
 Many students in previous semesters found this section difficult, because most of data exploration is not taught explicitly in class. Appendix~\ref{app:data-exploration} gives a list of guiding questions to walk you through the process. The questions point out the common issues you should look for and the standard strategies for handling them.
 \end{comment}
-The dataset contains 870 survey responses from 290 students. Each student answered the 12 questions three times, once for each sport: soccer, basketball, and baseball. It is a 3-class classification problem. Each row has 12 features, including one numeric rating, three Likert-scale questions, three multi-select questions, five free-text questions (one of which is a number). We do not use the unique ID as a feature, because it identifies the respondent rather than the sport. The classes are perfectly balanced, with 232 examples for each sport in the training set.
+The dataset contains 870 survey responses from 290 students. Each student answered the 12 questions three times, once for each sport: soccer, basketball, and baseball. It is a 3-class classification problem. Each row has 12 features, including one numeric rating, three Likert-scale questions, three multi-select questions, and five free-text questions (one of which is a number). We do not use the unique ID as a feature, because it identifies the respondent rather than the sport. The classes are perfectly balanced, with 232 examples for each sport in the training set.
 
-Before data exploration, we split the dataset into a training set of 696 examples (80\%) and a test set of 174 examples (20\%). We split by student ID rather than by row because a student's three responses share the same writing style; otherwise the model could recognize respondents instead of sports and overestimate test accuracy. The test set was set aside and not used for any exploration, preprocessing decision or tuning; hyperparameters are instead tuned by 5-fold cross-validation grouped by student ID within the training set (Section~\ref{sec:methodology}).
+Before data exploration, we split the dataset (seed 42) into a training set of 696 examples (80\%) and a test set of 174 examples (20\%). We split by student ID rather than by row because a student's three responses share the same writing style; otherwise the model could recognize respondents instead of sports and overestimate test accuracy. The test set was set aside and not used for any exploration, preprocessing decision or tuning; hyperparameters are instead tuned by 5-fold cross-validation grouped by student ID within the training set (Section~\ref{sec:methodology}).
+
+Seven training responses from three students are completely empty; we drop them from training since they carry no information, and all statistics below are computed on the remaining 689 rows.
 
 \subsection{Numeric features}
-1. feature types and distributions, inconsistencies
-2. missing values and outliers, how to handle them
-3. how to preprocess this feature
+First, the only numeric feature is the rating, a score from 0 to 10. The overall distribution is roughly symmetric with mean 5.4, median 5, and standard deviation 2.4. It separates Baseball from the other two sports. Mean ratings are 4.0 for Baseball, 6.0 for Basketball and 6.2 for Soccer. 48\% of Baseball responses fall between 0 and 3 compared to 12\% for Basketball and 16\% for Soccer.
+Second, it has no missing values, no outliers, and no inconsistencies.
+
+TODO: Feature engineering
 
 \subsection{Likert features}
-1. feature types and distributions, inconsistencies
-2. missing values and outliers, how to handle them
-3. how to preprocess this feature
+First, the three Likert questions (strategy, injury, individual) each have five answers from ``Strongly disagree'' to ``Strongly agree''. Figure~\ref{fig:likert} shows that Baseball responses disagree more often on injury; Soccer responses disagree more often on individual.
+Second, strategy and individual each have one missing value. We handle this by imputing the training median values. Injury has no missing values. There are no outliers or inconsistencies.
+
+\maybeincludegraphics{figures/likert_by_class.pdf}{Distribution of Likert answers within each class in percent.}{fig:likert}
+
+TODO: Feature engineering
 
 \subsection{Multi-select features}
-1. feature types and distributions, inconsistencies
-2. missing values and outliers, how to handle them
-3. how to preprocess this feature
+First, the three multi-select questions have 7 options for place, 4 for season, and 10 for music. Figure~\ref{fig:multi} shows that Indoor, Winter and Rap point to Basketball; Latin points to Soccer; Country points to Baseball, and Baseball is rarely played at home.
+Second, there are no missing values, no outliers, and no inconsistencies.
+
+\maybeincludegraphics{figures/multi_by_class.pdf}{Percentage of each class selecting each multi-select option.}{fig:multi}
+
+TODO: Feature engineering
 
 \subsection{Free-text features}
-1. feature types and distributions, inconsistencies
-2. missing values and outliers, how to handle them
-3. how to preprocess this feature
+First, the four free-text questions (food, colour, song, feeling) are open-ended short answers. Each class has distinctive words, e.g., ``waka waka'' for Soccer and ``orange'' for Basketball.
+Second, we handle inconsistencies like ``blue.'' or ``Blue'' by standardizing capitalization and removing punctuation. We handle missing values like ``none'' or ``idk'' by adding a missing indicator. There are no outliers.
+
+TODO: Feature engineering
 
 \subsection{Price features}
+First, the price question asks for a number but is free text. The distribution is highly right-skewed: median 100, 95th percentile 1000. The median differs by class: 50 for Baseball, 150 for Basketball and 200 for Soccer.
+Second, there are some outliers up to 10000. We keep these values and apply a $\log(1+x)$ transformation. There are also inconsistencies like ``5k'', ``100-300'' and ``150CAD''. We handle these by parsing the text to float using regex. We handle missing values by imputing the training median value.
 
-1. feature types and distributions, inconsistencies
-2. missing values and outliers, how to handle them
-3. how to preprocess this feature
+TODO: Feature engineering
 
 \section{Methodology}\label{sec:methodology}
 

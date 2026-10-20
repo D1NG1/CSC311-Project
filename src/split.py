@@ -37,5 +37,6 @@ def main():
     df_train.to_csv(SPLIT_DIR / "train.csv", index=False)
     df_test.to_csv(SPLIT_DIR / "test.csv", index=False)
 
+
 if __name__ == "__main__":
     main()

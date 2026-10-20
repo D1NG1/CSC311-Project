@@ -13,17 +13,21 @@ def rename_columns(df):
     """Replace the long survey questions with short column names."""
     return df.rename(columns=COLUMNS)
 
+
 def normalize_missing(s):
     """Strip whitespace and turn empty or "no answer" text into NaN."""
     s = s.astype("string").str.strip()
     is_missing = s.isna() | (s == "") | s.str.fullmatch(MISSING_PATTERN).fillna(False)
     return s.mask(is_missing, np.nan)
+
+
 def parse_text_col(s):
     """Clean a free-text column: "no answer" -> NaN, lowercase, remove punctuation, collapse whitespace."""
     s = normalize_missing(s).str.lower()
     s = s.str.replace(r"[^\w\s]", " ", regex=True)  # punctuation -> space
     s = s.str.replace(r"\s+", " ", regex=True).str.strip()
     return s.mask(s == "", np.nan)
+
 
 def parse_price(text):
     """Turn one price answer into a number, e.g. "$1,000" -> 1000. NaN if unparseable."""
@@ -39,6 +43,8 @@ def parse_price(text):
     if ZERO_PRICE_PATTERN.search(text):
         return 0.0
     return np.nan
+
+
 def parse_price_col(s):
     """Apply parse_price to a whole column."""
     return s.map(parse_price).astype(float)
@@ -89,4 +95,3 @@ def drop_empty_rows(df):
     """Drop rows where every feature is missing. Use on training data only."""
     features = [RATING_COL, *LIKERT_COLS, *MULTI_COLS, *TEXT_COLS, PRICE_COL]
     return df[df[features].notna().any(axis=1)]
-

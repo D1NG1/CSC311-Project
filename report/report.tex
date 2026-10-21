@@ -155,7 +155,7 @@ examples (80\%) and a test set of 174 examples (20\%). We split by student ID ra
 than by row because a student's three responses share the same writing style; otherwise
 the model could recognize respondents instead of sports and overestimate test accuracy.
 The test set was set aside and not used for any exploration, preprocessing decision or
-tuning; hyperparameters are instead tuned by 5-fold cross-validation grouped by student
+tuning; hyperparameters will instead be tuned by 5-fold cross-validation grouped by student
 ID within the training set (Section~\ref{sec:methodology}).
 
 Seven training responses from three students are completely empty; we drop them from
@@ -189,7 +189,8 @@ each class in percent.}{fig:likert}
 
 One way to encode the answers is as values from 1 to 5, preserving the natural order.
 Alternatively, one-hot encoding can be used and we will compare during validation.
-Also notice that the strategy question shows some separation between the sports but shows
+Encoding answers from 1 to 5 assumes equal gaps between agreement levels, while one-hot
+encoding creates more features. Also notice that the strategy question shows some separation between the sports but shows
 less separation than the other two questions. It is worth comparing models with/without this feature.
 For any missing values in the test set, we will impute the training median value as above.
 
@@ -203,10 +204,9 @@ Second, there are no missing values, no outliers, and no inconsistencies.
 \maybeincludegraphics{figures/multi_by_class.pdf}{Percentage of each class selecting
 each multi-select option.}{fig:multi}
 
-One way to represent these answers is using multi-hot encoding for each option.
-We can also consider encoding some combinations of options as features, removing 
-redundant features, and to potentially allow the model to learn from combinations of options,
-although it is unclear which combinations are useful. To start, we will use the simple
+One way to represent these answers is using multi-hot encoding for each option, giving 21 features.
+We can also consider adding features for certain combinations of options. However, it is unclear
+which combinations are useful, or if we are just adding redundancy. To start, we will use the simple
 multi-hot encoding approach.
 
 \subsection{Free-text features}
@@ -218,9 +218,12 @@ capitalization and removing punctuation. We handle missing values like ``none'' 
 ``idk'' by adding a missing indicator. There are no outliers.
 
 We will start with TF-IDF, keeping only words found in at least three training
-answers to limit the number of features. We will tune the text feature settings
-during validation. Another simple approach could be to select some distinctive words
-for each class and use them as multi-hot encoded features.
+answers. Each word gets a feature based on its count in an answer, with less weight
+given to words appearing in many training answers. So less common words
+are weighted higher, which may help highlight the class distinctive words we observed in exploration.
+Any words that aren't seen in the training set will be ignored at prediction time.
+This is reasonable since unseen words can't be associated with any class using TF-IDF.
+Alternatively, we could use word embeddings to capture semantic similarity. We can compare these approaches during validation.
 
 \subsection{Price features}
 First, the price question asks for a number but is free text. The distribution is highly
@@ -233,8 +236,9 @@ values by imputing the training median value.
 
 The differences in median price suggest it provides useful information for
 distinguishing the sports. We will keep the price feature and compare the performance
-of the model with and without the $\log$ transformation. We will scale the price features
-for models that are sensitive to feature scale (e.g., softmax regression).
+of the model with and without the $\log$ transformation. For models sensitive to
+scale, such as regularized softmax regression, we will standardize prices after
+the selected transformation, using the training mean and standard deviation.
 
 \section{Methodology}\label{sec:methodology}
 

@@ -253,12 +253,20 @@ the selected transformation, using the training mean and standard deviation.
 % a deep network, because a simpler model may perform just as well and is easier to
 % interpret.
 
-TODO: choose three model families and explain why they suit the data.
+We plan to compare the following model families:
 
 \begin{itemize}
-  \item \textbf{Linear models:} TODO
-  \item \textbf{Tree-based models:} TODO
-  \item \textbf{Neural networks:} TODO
+  \item \textbf{Linear models:} Softmax regression is a simple linear model that can handle multi-class classification serving 
+  as a baseline. Above, we described methods to encode all the features into numeric values, so they can be used directly in a linear model.
+  It isn't clear whether the classes are linearly separable from our data exploration step, but we can 
+  use this simple model family as a baseline to determine whether we require more complex models. 
+  \item \textbf{Tree-based models:} Decision trees are a natural choice for classification problems, and they are universal function
+  approximators allowing it to learn non-linear relationships. They don't require feature scaling and they are easily interpretable. 
+  They can also learn combinations of the Likert or multi-select features naturally, compared to e.g., softmax regression which can only add 
+  individual contributions of each feature. We can also consider ensemble methods like random forests to improve performance and reduce overfitting, 
+  which can be a disadvantage of standard decision trees.
+  \item \textbf{Neural networks:} An MLP can learn non-linear relationships unlike pure linear models. It isn't as interpretable as a decision tree,
+  but it can also learn complex relationships, we can use a final softmax layer to output the probabilities of each class, and it is worth testing.
   % TODO: Any other model families to consider? 
 \end{itemize}
 
@@ -268,7 +276,11 @@ TODO: choose three model families and explain why they suit the data.
 % hyperparameters on a validation set that is separate from the training data. Never
 % use the test set for training, feature engineering, or tuning.
 
-TODO: describe grouped validation by student ID and how preprocessing is fitted.
+We have split the dataset into a training set and a test set (80/20 split) by student ID.
+We plan to perform 5-fold cross-validation grouped by student ID within the training set
+as described in Section~\ref{sec:data-exploration}. The dataset is small, so the computational
+cost of cross-validation should be reasonable, and it will reduce the dependence of our results
+on a single random split. To be fair, we will use the same splits for all model families and feature setting.
 
 \subsection{Training and tuning}
 % Make sure to describe how you trained each model so that your results can be

@@ -258,13 +258,14 @@ We plan to compare the following model families:
 \begin{itemize}
   \item \textbf{Linear models:} Softmax regression is a simple linear model that can handle multi-class classification serving 
   as a baseline. Above, we described methods to encode all the features into numeric values, so they can be used directly in a linear model.
-  It isn't clear whether the classes are linearly separable from our data exploration step, but we can 
-  use this simple model family as a baseline to determine whether we require more complex models. 
+  It isn't clear whether the classes are linearly separable from our data exploration step, but from our data exploration, we observed
+  that several features that have clear differences between classes. We can test whether a linear model is sufficient to capture these relationships.
   \item \textbf{Tree-based models:} Decision trees are a natural choice for classification problems, and they are universal function
   approximators allowing it to learn non-linear relationships. They don't require feature scaling and they are easily interpretable. 
   They can also learn combinations of the Likert or multi-select features naturally, compared to e.g., softmax regression which can only add 
-  individual contributions of each feature. We can also consider ensemble methods like random forests to improve performance and reduce overfitting, 
-  which can be a disadvantage of standard decision trees.
+  individual contributions of each feature. In our data exploration, we can see several features like ``injury'' which can clearly separate
+  baseball from the other two sports, and a decision tree can learn to split on this feature. We can also consider ensemble methods like random forests to 
+  improve performance and reduce overfitting, which can be a disadvantage of standard decision trees.
   \item \textbf{Neural networks:} An MLP can learn non-linear relationships unlike pure linear models. It isn't as interpretable as a decision tree,
   but it can also learn complex relationships, we can use a final softmax layer to output the probabilities of each class, and it is worth testing.
   % TODO: Any other model families to consider? 
@@ -301,8 +302,17 @@ on a single random split. To be fair, we will use the same splits for all model 
 % Optionally, you may describe any additional techniques you tried, such as feature
 % engineering, clustering, or PCA.
 
-TODO: specify training methods, hyperparameter ranges, and stopping rules for each
-model.
+We plan to use scikit-learn and compare each setting using mean accuracy across the same five grouped validation folds.
+Tune all three models before selecting a family, and use seed 42 where applicable.
+
+\begin{itemize}
+  \item \textbf{Softmax regression:} we plan to use L-BFGS to fit the model with L2
+    regularization. TODO: which hyperparameters to tune, what values to try, when to stop, etc.
+  \item \textbf{Decision tree:} use Gini impurity to choose splits that make the
+    resulting groups more concentrated in one sport. TODO
+  \item \textbf{MLP:} start with one hidden layer using ReLU and train with Adam
+    on cross-entropy loss. TODO
+\end{itemize}
 
 \subsection{Evaluation and final model}
 % Describe the evaluation metrics you used and justify each one. Report at least one
@@ -312,8 +322,10 @@ model.
 
 % Appendix~\ref{app:methodology} gives a list of guiding questions to work through
 % before you write this section.
-
-TODO: choose evaluation metrics and explain how we will select the final model.
+We will tune all three model families and compare their average accuracy and F1 across 
+the validation folds. If the performance is similar between models, we will prefer the simpler model.
+The selected model will be retrained on the entire training set and evaluated on the test set.
+We won't do any additional training or tuning after we have selected the final model and evaluated on the test set.
 
 % ===========================================
 % 5. Results

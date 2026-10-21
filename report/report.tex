@@ -238,46 +238,66 @@ for models that are sensitive to feature scale (e.g., softmax regression).
 
 \section{Methodology}\label{sec:methodology}
 
-TODO: draft PLAN for methodology section for proposal
+\subsection{Models to compare}
+% This section of your report should be at most 3 pages.
 
-This section of your report should be at most 3 pages.
+% The goal of the Methodology step is to describe how you trained, tuned, and
+% evaluated your models in enough detail that a reader could reproduce your results.
 
-The goal of the Methodology step is to describe how you trained, tuned, and evaluated
-your models in enough detail that a reader could reproduce your results.
+% Present the three model families you used and explain why each one suits the
+% dataset, drawing on what you found during data exploration. Do not jump straight to
+% a deep network, because a simpler model may perform just as well and is easier to
+% interpret.
 
-Present the three model families you used and explain why each one suits the dataset,
-drawing on what you found during data exploration. Do not jump straight to a deep
-network, because a simpler model may perform just as well and is easier to interpret.
+TODO: choose three model families and explain why they suit the data.
 
-Make sure to describe how you trained each model so that your results can be reproduced.
-State the optimizer (e.g., SGD or Adam), the learning rate schedule if you used one, and
-any regularization or early stopping. Briefly name the libraries you used and describe
-any custom code you wrote.
+\begin{itemize}
+  \item \textbf{Linear models:} TODO
+  \item \textbf{Tree-based models:} TODO
+  \item \textbf{Neural networks:} TODO
+  % TODO: Any other model families to consider? 
+\end{itemize}
 
-Explain how you split the data into training and validation sets, or how you applied
-cross-validation, so that the reader can trust your comparisons. Tune hyperparameters on
-a validation set that is separate from the training data. Never use the test set for
-training, feature engineering, or tuning.
+\subsection{Validation and preprocessing}
+% Explain how you split the data into training and validation sets, or how you applied
+% cross-validation, so that the reader can trust your comparisons. Tune
+% hyperparameters on a validation set that is separate from the training data. Never
+% use the test set for training, feature engineering, or tuning.
 
-Summarize your hyperparameter tuning by stating which hyperparameters you varied, how
-you chose the values to try, and which metric you used to compare them. An exhaustive
-search is not required, but you should show that your choices are reasonable.
+TODO: describe grouped validation by student ID and how preprocessing is fitted.
 
-Be sure to tune every model family before you compare them. Choosing the best model
-using default hyperparameters and then tuning only that model is unfair to the other
-models, which might improve just as much with tuning. This was the most common mistake
-we saw when grading reports in previous semesters.
+\subsection{Training and tuning}
+% Make sure to describe how you trained each model so that your results can be
+% reproduced. State the optimizer (e.g., SGD or Adam), the learning rate schedule if
+% you used one, and any regularization or early stopping. Briefly name the libraries
+% you used and describe any custom code you wrote.
 
-Describe the evaluation metrics you used and justify each one. Report at least one
-metric beyond accuracy, such as precision, recall, or F1, because accuracy alone can
-hide poor performance on one of the classes. Make sure every table and plot has
-appropriate labels and an explanation of what it shows.
+% Summarize your hyperparameter tuning by stating which hyperparameters you varied,
+% how you chose the values to try, and which metric you used to compare them. An
+% exhaustive search is not required, but you should show that your choices are
+% reasonable.
 
-Optionally, you may describe any additional techniques you tried, such as feature
-engineering, clustering, or PCA.
+% Be sure to tune every model family before you compare them. Choosing the best model
+% using default hyperparameters and then tuning only that model is unfair to the other
+% models, which might improve just as much with tuning. This was the most common
+% mistake we saw when grading reports in previous semesters.
 
-Appendix~\ref{app:methodology} gives a list of guiding questions to work through before
-you write this section.
+% Optionally, you may describe any additional techniques you tried, such as feature
+% engineering, clustering, or PCA.
+
+TODO: specify training methods, hyperparameter ranges, and stopping rules for each
+model.
+
+\subsection{Evaluation and final model}
+% Describe the evaluation metrics you used and justify each one. Report at least one
+% metric beyond accuracy, such as precision, recall, or F1, because accuracy alone can
+% hide poor performance on one of the classes. Make sure every table and plot has
+% appropriate labels and an explanation of what it shows.
+
+% Appendix~\ref{app:methodology} gives a list of guiding questions to work through
+% before you write this section.
+
+TODO: choose evaluation metrics and explain how we will select the final model.
 
 % ===========================================
 % 5. Results

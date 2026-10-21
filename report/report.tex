@@ -83,21 +83,21 @@
 
     {\Large {CSC311: Introduction to Machine Learning} \par}
     \vspace{1cm}
-    
+
     {\Large {Project Report} \par}
     \vspace{1cm}
-    
+
     {\large \textit{Predicting Sports from Survey Responses} \par}
     \vspace{3cm}
-    
+
     {\large Submitted by \par}
-    
+
     \vspace{0.5cm}
     {\large Group 63083 \par}
-    
+
     \vspace{0.5cm}
     {\large Dennys Ding, Kaiyang Chang, Ryan Xue \par}
-    
+
     \vfill
     {\large University of Toronto \\ Fall 2026 \par}
 \end{titlepage}
@@ -112,14 +112,14 @@
 This section should be at most 1/4 page (1 paragraph).
 
 \begin{itemize}
-  \item Summarize the model families you explored (at least three).  
-  \item State your best-performing model and its projected accuracy.  
-  \item Provide a high-level justification of why this model outperformed the others.  
+  \item Summarize the model families you explored (at least three).
+  \item State your best-performing model and its projected accuracy.
+  \item Provide a high-level justification of why this model outperformed the others.
 \end{itemize}
 
 \section{Data Exploration}\label{sec:data-exploration}
 \begin{comment}
-This section of your report should be at most 2 pages. 
+This section of your report should be at most 2 pages.
 
 The goal of the Data Exploration step is to understand your dataset well enough to
 decide how to prepare it and which models to try.
@@ -170,7 +170,10 @@ for Basketball and 6.2 for Soccer. 48\% of Baseball responses fall between 0 and
 compared to 12\% for Basketball and 16\% for Soccer.
 Second, it has no missing values, no outliers, and no inconsistencies.
 
-TODO: Feature engineering
+The rating gives us a clear predictive signal to differentiate between Baseball and the other two sports, so we should keep it.
+Additionally, as the rating is numeric with a known range, it is reasonable to use it directly as a feature,
+divide by 10 to scale it to $[0,1]$, or standardize it using training mean and standard deviation.
+We will compare these options on the validation set for each of our chosen models to see which one works best.
 
 \subsection{Likert features}
 First, the three Likert questions (strategy, injury, individual) each have five answers
@@ -184,7 +187,11 @@ inconsistencies.
 \maybeincludegraphics{figures/likert_by_class.pdf}{Distribution of Likert answers within
 each class in percent.}{fig:likert}
 
-TODO: Feature engineering
+One way to encode the answers is as values from 1 to 5, preserving the natural order.
+Alternatively, one-hot encoding can be used and we will compare during validation.
+Also notice that the strategy question shows some separation between the sports but shows
+less separation than the other two questions. It is worth comparing models with/without this feature.
+For any missing values in the test set, we will impute the training median value as above.
 
 \subsection{Multi-select features}
 First, the three multi-select questions have 7 options for place, 4 for season, and 10
@@ -196,7 +203,11 @@ Second, there are no missing values, no outliers, and no inconsistencies.
 \maybeincludegraphics{figures/multi_by_class.pdf}{Percentage of each class selecting
 each multi-select option.}{fig:multi}
 
-TODO: Feature engineering
+One way to represent these answers is using multi-hot encoding for each option.
+We can also consider encoding some combinations of options as features, removing 
+redundant features, and to potentially allow the model to learn from combinations of options,
+although it is unclear which combinations are useful. To start, we will use the simple
+multi-hot encoding approach.
 
 \subsection{Free-text features}
 First, the four free-text questions (food, colour, song, feeling) are open-ended short
@@ -206,20 +217,28 @@ Second, we handle inconsistencies like ``blue.'' or ``Blue'' by standardizing
 capitalization and removing punctuation. We handle missing values like ``none'' or
 ``idk'' by adding a missing indicator. There are no outliers.
 
-TODO: Feature engineering
+We will start with TF-IDF, keeping only words found in at least three training
+answers to limit the number of features. We will tune the text feature settings
+during validation. Another simple approach could be to select some distinctive words
+for each class and use them as multi-hot encoded features.
 
 \subsection{Price features}
 First, the price question asks for a number but is free text. The distribution is highly
 right-skewed: median 100, 95th percentile 1000. The median differs by class: 50 for
 Baseball, 150 for Basketball and 200 for Soccer.
-Second, there are some outliers up to 10000. We keep these values and apply a
+Second, there are some outliers up to 10000. We plan to keep these values and apply a
 $\log(1+x)$ transformation. There are also inconsistencies like ``5k'', ``100-300'' and
 ``150CAD''. We handle these by parsing the text to float using regex. We handle missing
 values by imputing the training median value.
 
-TODO: Feature engineering
+The differences in median price suggest it provides useful information for
+distinguishing the sports. We will keep the price feature and compare the performance
+of the model with and without the $\log$ transformation. We will scale the price features
+for models that are sensitive to feature scale (e.g., softmax regression).
 
 \section{Methodology}\label{sec:methodology}
+
+TODO: draft PLAN for methodology section for proposal
 
 This section of your report should be at most 3 pages.
 
@@ -327,13 +346,13 @@ with the rest of the instructions.
 %
 %\begin{enumerate}
 %
-%\item Is the task classification or regression? If it is a classification problem, what is the number of classes? 
+%\item Is the task classification or regression? If it is a classification problem, what is the number of classes?
 %
 %\end{enumerate}
 
 \begin{enumerate}
 
-\item Determine Input to Model 
+\item Determine Input to Model
 
 \begin{enumerate}
 
@@ -343,7 +362,7 @@ with the rest of the instructions.
 \item In the released data set, each row has a unique ID identifying which student
   provided the data. Why should we not use this unique ID as a feature?
 
-% What is the distribution of each feature over all the examples? Is the feature highly skewed? Is there enough variation? Are there outliers? 
+% What is the distribution of each feature over all the examples? Is the feature highly skewed? Is there enough variation? Are there outliers?
 
 \end{enumerate}
 
@@ -371,7 +390,7 @@ One reason for exploring the distributions of features is to get to know the dat
 building any model. This exploration can help us catch common issues such as outliers,
 skewed distributions, class imbalance, missing values, and large difference in feature
 scales.
-   
+
 \smallskip
 \begin{enumerate}
 
@@ -390,18 +409,18 @@ scales.
 
 \begin{enumerate}
 
-\item What is class imbalance? Why is class imbalance problematic? 
+\item What is class imbalance? Why is class imbalance problematic?
 
 \item Does the dataset have a class imbalance issue? If so, how severe?
 
-\item What are some common strategies to address class imbalance? 
+\item What are some common strategies to address class imbalance?
 
 \end{enumerate}
 
 \item Missing Values
 
 \begin{enumerate}
- 
+
 \item First, determine if the dataset contains missing values. Report the percentage of
   values missing for each feature in a table. A missing value can take many forms such
   as a null value, an empty string, an empty list, ``n/a'', or ``-''. Normalize all of
@@ -428,7 +447,7 @@ determining this?
 
 \item When is it appropriate to use each strategy above to handle missing values?
 
-\item 
+\item
 Suppose that you decide to impute the median value for a numeric feature. Why is it
 problematic to do the imputation on the validation and test sets?
 
@@ -441,7 +460,7 @@ problematic to do the imputation on the validation and test sets?
 
 \begin{enumerate}
 
-\item What observation might cause you to suspect that certain values are outliers? 
+\item What observation might cause you to suspect that certain values are outliers?
 
 \item How do I determine whether a feature value should be considered an outlier?
 
@@ -453,7 +472,7 @@ problematic to do the imputation on the validation and test sets?
 
 \begin{enumerate}
 
-\item How can we convert the responses to a multi-select question into a feature? 
+\item How can we convert the responses to a multi-select question into a feature?
 
 \item The survey has a few Likert-scale questions that ask respondents to indicate their
   level of agreement to a statement using an ordered set of options (e.g., from Strongly

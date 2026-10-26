@@ -302,16 +302,27 @@ on a single random split. To be fair, we will use the same splits for all model 
 % Optionally, you may describe any additional techniques you tried, such as feature
 % engineering, clustering, or PCA.
 
-We plan to use scikit-learn and compare each setting using mean accuracy across the same five grouped validation folds.
-Tune all three models before selecting a family, and use seed 42 where applicable.
+We use scikit-learn for all models and write code to clean the text and parse prices with regex. We tune all three model families on the same five grouped folds before comparing them, and compare settings by mean validation accuracy. We use log spaced values for lambda and the learning rate, and extend any grid whose best value lies at its edge. We also tune the preprocessing choices from section 2: rating scaling, log price, ordinal vs one-hot Likert encoding, and whether to include the strategy Likert feature.
 
 \begin{itemize}
-  \item \textbf{Softmax regression:} we plan to use L-BFGS to fit the model with L2
-    regularization. TODO: which hyperparameters to tune, what values to try, when to stop, etc.
-  \item \textbf{Decision tree:} use Gini impurity to choose splits that make the
-    resulting groups more concentrated in one sport. TODO
-  \item \textbf{MLP:} start with one hidden layer using ReLU and train with Adam
-    on cross-entropy loss. TODO
+  \item \textbf{Softmax regression:} The model computes logits and applies softmax to get probabilities. We can train the model by minimizing the average cross-entropy loss plus a L2 regularizer. After encoding, we have mostly TF-IDF features and around 550 training examples per fold. This could result in the model overfitting. By having the regularizer we discourage large weights. We will also tune lambda (lambda: 0.01, 0.1, 1, 10) so it's not too small resulting in overfitting or too large allowing the regularizer to dominate the model causing underfitting. We will minimize the cost using L-BFGS and stop when the cost stops decreasing. The rating and price will be standardized for this model which reduces ravines in the cost function.
+  \\
+  \item \textbf{Decision tree:} We will use the greedy method to build our decision tree. At each node we will choose the feature and a threshold that will maximize information gain. We also try Gini impurity to choose splits resulting in groups more concentrated in one sport. We will also control the size by creating stopping criteria to avoid the tree memorizing training set. eg.
+Max depth: 5-15
+Min sample per leaf: 5-20
+Min sample per node 5-20
+Deeper trees with small leaves have a lower bias but higher variance and we could also try random forest, which averages many randomized trees to reduce variance. We have the hyperparameters chosen by validation accuracy of the whole ensemble and we could tune the forest like:
+Number of trees M: 50, 100, 300
+Feature subset size: $\sqrt(D)$, $\log_2(D)$
+Max depth using same as single tree
+\\
+  \item \textbf{MLP:} We use a fully connected network with 1 hidden layer of ReLU units and a softmax output layer with 1 unit per sport. We chose ReLU because it helps prevent vanishing gradients unlike sigmoid and tanh, and avoids saturation for positive inputs. This is trained on cross entropy loss using backpropagation and mini-batch descent using Adam with a constant learning rate. Similarly we tune the number of hidden units (hyperparameters):
+Hidden units: 16, 32, 64, 128
+L2 penalty lambda: 0.0001, 0.001, 0.01, 0.1
+Learning rate: 0.0001, 0.001, 0.01
+Batch size: 32, 64, 128
+Because the learning rate and batch size interact we tune them together. A small learning rate takes too long to train, but a large one can cause missing the minimum or oscillation. We train for a fixed number of epochs, chosen from {50, 100, 200, 400} by grouped cross validation. Weight initialization and mini batch order are random, so we fix the seed to 42. 
+\\
 \end{itemize}
 
 \subsection{Evaluation and final model}

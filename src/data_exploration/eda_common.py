@@ -7,7 +7,7 @@ sys.path.insert(0, str(SRC))  # so we can import from src/
 
 import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
-from preprocess import clean, drop_empty_rows, rename_columns  # noqa: E402
+from data_cleaning.clean import clean, drop_empty_rows, rename_columns  # noqa: E402
 
 TRAIN = SRC.parent / "data" / "splits" / "train.csv"
 FIG_DIR = SRC.parent / "report" / "figures"

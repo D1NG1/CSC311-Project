@@ -2,8 +2,8 @@
 import pandas as pd
 
 from eda_common import CLASSES, df, raw
-from config import TEXT_COLS
-from text import tokenize
+from data_cleaning.config import TEXT_COLS
+from data_preprocessing.text import tokenize
 
 STOPWORDS = set("a an and the of to for in on with by i it is me my you but or this that be at so very s t we when".split())
 

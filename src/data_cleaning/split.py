@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]
 DATA_FILE = ROOT / "data" / "csc311_project_training_202609.csv"
 SPLIT_DIR = ROOT / "data" / "splits"
 

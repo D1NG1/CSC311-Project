@@ -25,8 +25,8 @@ FEATURE_GRID = {
 
 class SklearnFeaturizer(TransformerMixin, BaseEstimator, Featurizer):
     """
-    Featurizer usable as a scikit-learn Pipeline step, so GridSearchCV can tune its
-    options and refit it on each training fold.
+    Featurizer class modified to match sklearn's conventions.
+    For use in sklearn Pipeline and GridSearchCV.
     """
 
     def fit(self, X, y=None):

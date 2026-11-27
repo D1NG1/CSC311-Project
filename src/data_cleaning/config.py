@@ -1,4 +1,4 @@
-"""Column names, option lists, and regex patterns used by preprocess.py."""
+"""Column names, option lists, and regex patterns used by the cleaning and preprocessing code."""
 import re
 
 # Survey question -> short column name
@@ -28,7 +28,7 @@ PRICE_COL = "price"
 
 # Free-text answers that mean "no answer
 MISSING_PATTERN = re.compile(
-    r"^\W*(n/?a|none|nothing|no|null|idk|i don'?t know|don'?t know|no idea|"
+    r"^\W*(n/?a|none|nothing|no|nil|null|idk|i don['’]?t know|don['’]?t know|no idea|"
     r"not sure|unsure|no song|no particular \w*|-+|\?+)\W*$",
     re.IGNORECASE,
 )
@@ -40,7 +40,9 @@ ZERO_PRICE_PATTERN = re.compile(
 )
 
 NUMBER_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s*(k\b)?", re.IGNORECASE)
-RANGE_PATTERN = re.compile(r"\d\s*(-|to|~)\s*\$?\s*\d", re.IGNORECASE)
+RANGE_PATTERN = re.compile(r"\d\s*(-|–|—|to|~)\s*\$?\s*\d", re.IGNORECASE)  # "100-200", "$80–$120"
+THOUSANDS_SPACE_PATTERN = re.compile(r"(?<=\d)[ \xa0](?=\d{3}\b)")  # "10 000" -> "10000"
+NOT_PRICE_PATTERN = re.compile(r"\bscale\b", re.IGNORECASE)  # "1 to 10 scale i will put a 2"
 
 LIKERT_MAP = {
     "Strongly disagree": 1,

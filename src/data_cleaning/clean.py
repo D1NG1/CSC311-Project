@@ -1,11 +1,11 @@
-"""Clean the survey data and build numeric features. Uses only numpy/pandas."""
+"""Clean the raw survey data with fixed rules (nothing is learned from data). Uses only numpy/pandas."""
 import numpy as np
 import pandas as pd
 
-from config import (
-    COLUMNS, LIKERT_MAP, MULTI_OPTIONS,
+from data_cleaning.config import (
+    COLUMNS, LIKERT_MAP,
     MISSING_PATTERN, ZERO_PRICE_PATTERN, NUMBER_PATTERN, RANGE_PATTERN,
-    RATING_COL, LIKERT_COLS, MULTI_COLS, TEXT_COLS, PRICE_COL,
+    THOUSANDS_SPACE_PATTERN, NOT_PRICE_PATTERN, RATING_COL, LIKERT_COLS, MULTI_COLS, TEXT_COLS, PRICE_COL,
 )
 
 
@@ -24,7 +24,8 @@ def normalize_missing(s):
 def parse_text_col(s):
     """Clean a free-text column: "no answer" -> NaN, lowercase, remove punctuation, collapse whitespace."""
     s = normalize_missing(s).str.lower()
-    s = s.str.replace(r"[^\w\s]", " ", regex=True)  # punctuation -> space
+    s = s.str.replace(r"['’]", "", regex=True)  # "don't" -> "dont", not "don t"
+    s = s.str.replace(r"[^\w\s]", " ", regex=True)  # other punctuation -> space
     s = s.str.replace(r"\s+", " ", regex=True).str.strip()
     return s.mask(s == "", np.nan)
 
@@ -33,7 +34,9 @@ def parse_price(text):
     """Turn one price answer into a number, e.g. "$1,000" -> 1000. NaN if unparseable."""
     if pd.isna(text):
         return np.nan
-    text = str(text).replace(",", "")
+    text = THOUSANDS_SPACE_PATTERN.sub("", str(text).replace(",", ""))
+    if NOT_PRICE_PATTERN.search(text):  # answered with a rating, not a price
+        return np.nan
     numbers = [float(n) * (1000 if k else 1) for n, k in NUMBER_PATTERN.findall(text)]
     if numbers:
         # A range like "100-200" -> 150, otherwise take the first number
@@ -61,19 +64,6 @@ def parse_rating_col(s):
     return s.where(s.between(0, 10)).astype(float)
 
 
-def parse_multi_col(s, col):
-    """
-    Turn a multi-select column into one 0/1 column per option,
-    e.g. "Spring,Summer" -> season_Winter=0, season_Spring=1, season_Summer=1, season_Fall=0.
-    Empty answers get all zeros.
-    """
-    chosen = s.astype("string").fillna("").str.split(",").map(lambda xs: {x.strip() for x in xs})
-    return pd.DataFrame(
-        {f"{col}_{opt}": chosen.map(lambda xs: int(opt in xs)) for opt in MULTI_OPTIONS[col]},
-        index=s.index,
-    )
-
-
 def clean(df):
     """
     Apply all fixed cleaning rules to a raw survey table. Column names become short
@@ -95,3 +85,20 @@ def drop_empty_rows(df):
     """Drop rows where every feature is missing. Use on training data only."""
     features = [RATING_COL, *LIKERT_COLS, *MULTI_COLS, *TEXT_COLS, PRICE_COL]
     return df[df[features].notna().any(axis=1)]
+
+
+if __name__ == "__main__":
+    # Self-check: uv run python -m data_cleaning.clean  (from src/)
+    cases = {
+        "$1,000": 1000, "5k": 5000, "$10 000": 10000, "100CAD": 100,
+        "400 - 700": 550, "CAD $80–$120": 100, "50 to 150 CAD": 100,
+        "Not willing.": 0, "Zero": 0, "Thirty dollars": None, "n/a": None,
+        "1 to 10 scale i will put a 2": None,
+    }
+    for text, want in cases.items():
+        got = parse_price(text)
+        assert (np.isnan(got) if want is None else got == want), (text, got, want)
+    s = parse_text_col(pd.Series(["Don’t know", "nil", "I don't like it!", "  Blue. "]))
+    assert s.isna().tolist() == [True, True, False, False], s.tolist()
+    assert s[2:].tolist() == ["i dont like it", "blue"], s.tolist()
+    print("clean.py self-check passed")

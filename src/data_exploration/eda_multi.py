@@ -4,8 +4,8 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
 from eda_common import CLASSES, FIG_DIR, df, raw
-from config import MULTI_COLS, MULTI_OPTIONS
-from preprocess import parse_multi_col
+from data_cleaning.config import MULTI_COLS, MULTI_OPTIONS
+from data_preprocessing.features import parse_multi_col
 
 # Shorter option names for the figure
 SHORT = {

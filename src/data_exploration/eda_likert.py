@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from eda_common import CLASSES, FIG_DIR, df, raw
-from config import LIKERT_COLS, LIKERT_MAP
+from data_cleaning.config import LIKERT_COLS, LIKERT_MAP
 
 for col in LIKERT_COLS:
     print(col, "| missing", df[col].isna().sum(), "| unexpected", set(raw[col].dropna()) - set(LIKERT_MAP))
